@@ -9,10 +9,11 @@ export interface ImpactProps {
   className?: string
 }
 
-// Custom hook for animated counter
+// Custom hook for animated counter that increases every 1.5 seconds
 function useAnimatedCounter(end: number, duration: number = 2) {
   const [count, setCount] = React.useState(0)
   const [hasAnimated, setHasAnimated] = React.useState(false)
+  const [isIncreasing, setIsIncreasing] = React.useState(false)
 
   const animate = React.useCallback(() => {
     if (hasAnimated) return
@@ -26,6 +27,7 @@ function useAnimatedCounter(end: number, duration: number = 2) {
       if (start >= end) {
         setCount(end)
         clearInterval(timer)
+        setIsIncreasing(true)
       } else {
         setCount(Math.floor(start))
       }
@@ -33,6 +35,24 @@ function useAnimatedCounter(end: number, duration: number = 2) {
     
     return () => clearInterval(timer)
   }, [end, duration, hasAnimated])
+
+  // Function to increase numbers by 1 every 1.5 seconds
+  const startIncreasing = React.useCallback(() => {
+    if (!isIncreasing) return
+    
+    const increaseInterval = setInterval(() => {
+      setCount(prevCount => prevCount + 1)
+    }, 1500) // Every 1.5 seconds
+    
+    return () => clearInterval(increaseInterval)
+  }, [isIncreasing])
+
+  React.useEffect(() => {
+    if (isIncreasing) {
+      const cleanup = startIncreasing()
+      return cleanup
+    }
+  }, [isIncreasing, startIncreasing])
 
   return { count, animate }
 }
@@ -43,6 +63,7 @@ function ImpactCard({
   suffix, 
   title, 
   description, 
+  backgroundImage,
   delay = 0,
   inView 
 }: {
@@ -51,10 +72,11 @@ function ImpactCard({
   suffix: string
   title: string
   description: string
+  backgroundImage: string
   delay?: number
   inView: boolean
 }) {
-  const { count, animate } = useAnimatedCounter(value, 2)
+  const { count, animate } = useAnimatedCounter(value, 3)
 
   React.useEffect(() => {
     if (inView) {
@@ -65,32 +87,44 @@ function ImpactCard({
 
   return (
     <motion.div
-      className="bg-white rounded-2xl p-6 md:p-8 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-2 border border-gray-100"
+      className="relative rounded-2xl p-6 md:p-8 shadow-2xl hover:shadow-3xl transition-all duration-500 hover:-translate-y-3 h-full flex flex-col justify-center overflow-hidden group"
       initial={{ y: 50, opacity: 0 }}
       animate={inView ? { y: 0, opacity: 1 } : { y: 50, opacity: 0 }}
       transition={{ duration: 0.6, delay: delay * 0.2 }}
+      style={{
+        backgroundImage: `url(${backgroundImage})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat'
+      }}
     >
-      {/* Icon */}
-      <div className="flex justify-center mb-6">
-        <div className="w-16 h-16 bg-zyppGreen/10 rounded-full flex items-center justify-center">
-          <Icon className="w-8 h-8 text-zyppGreen" />
+      {/* Overlay for better text readability */}
+      <div className="absolute inset-0 bg-black/40 group-hover:bg-black/30 transition-all duration-300 rounded-2xl" />
+      
+      {/* Content */}
+      <div className="relative z-10 text-center">
+        {/* Icon */}
+        <div className="flex justify-center mb-4">
+          <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center group-hover:bg-white/30 transition-all duration-300">
+            <Icon className="w-8 h-8 text-white" />
+          </div>
         </div>
-      </div>
 
-      {/* Animated Counter */}
-      <div className="text-center mb-4">
-        <div className="text-4xl font-bold text-gray-900 mb-2">
-          {count.toLocaleString()}{suffix}
+        {/* Animated Counter */}
+        <div className="mb-4">
+          <div className="text-4xl md:text-5xl font-bold text-white mb-2 drop-shadow-lg">
+            {count.toLocaleString()}{suffix}
+          </div>
+          <h3 className="text-xl font-semibold text-white mb-3 drop-shadow-md">
+            {title}
+          </h3>
         </div>
-        <h3 className="text-xl font-semibold text-gray-800 mb-3">
-          {title}
-        </h3>
-      </div>
 
-      {/* Description */}
-      <p className="text-gray-600 text-center leading-relaxed">
-        {description}
-      </p>
+        {/* Description */}
+        <p className="text-white/90 text-center leading-relaxed drop-shadow-sm">
+          {description}
+        </p>
+      </div>
     </motion.div>
   )
 }
@@ -102,50 +136,38 @@ export function Impact({ className }: ImpactProps) {
   const impactData = [
     {
       icon: Leaf,
-      value: 20000,
-      suffix: "+",
+      value: 56882400,
+      suffix: "",
       title: "CO₂ Saved",
-      description: "Tons of CO₂ saved by avoiding greenhouse gas emissions through our electric fleet."
-    },
-    {
-      icon: TreePine,
-      value: 68000,
-      suffix: "+",
-      title: "Trees Planted",
-      description: "Trees planted through Zypp's environmental initiatives and carbon offset programs."
+      description: "CO₂ saved by avoiding greenhouse gas emissions.",
+      backgroundImage: "https://images.unsplash.com/photo-1569163139394-0d1b5d4b8a4b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
     },
     {
       icon: Truck,
-      value: 24,
-      suffix: "/7",
-      title: "Zypp Fleet",
-      description: "Our electric fleet delivering around the clock, ensuring sustainable last-mile delivery."
+      value: 142991300,
+      suffix: "",
+      title: "Deliveries Till Now",
+      description: "Successful deliveries completed by our electric fleet.",
+      backgroundImage: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+    },
+    {
+      icon: TreePine,
+      value: 2844111,
+      suffix: "",
+      title: "Trees Equivalent",
+      description: "Avoided greenhouse gas emissions equivalent to planting this many trees.",
+      backgroundImage: "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
     }
   ]
 
   return (
     <section 
       ref={ref}
-      className={cn("py-20 bg-gradient-to-b from-gray-50 to-white", className)}
+      className={cn("bg-white flex items-center py-4", className)}
     >
-      <div className="container mx-auto px-4">
-        {/* Section Header */}
-        <motion.div 
-          className="text-center mb-16"
-          initial={{ y: 30, opacity: 0 }}
-          animate={isInView ? { y: 0, opacity: 1 } : { y: 30, opacity: 0 }}
-          transition={{ duration: 0.6 }}
-        >
-          <h2 className="text-4xl font-bold text-gray-900 mb-4">
-            Our Environmental Impact
-          </h2>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Making a difference through sustainable delivery solutions
-          </p>
-        </motion.div>
-
-        {/* Impact Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 max-w-6xl mx-auto">
+      <div className="w-full px-1 mx-1">
+        {/* Impact Cards - No header, just cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-1 md:gap-2 w-full h-full">
           {impactData.map((item, index) => (
             <ImpactCard
               key={index}
@@ -154,6 +176,7 @@ export function Impact({ className }: ImpactProps) {
               suffix={item.suffix}
               title={item.title}
               description={item.description}
+              backgroundImage={item.backgroundImage}
               delay={index}
               inView={isInView}
             />

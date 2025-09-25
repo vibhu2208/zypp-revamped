@@ -63,6 +63,7 @@ export function PillNav({ items, activeId, onItemClick, className }: PillNavProp
     
     setHoveredItem(item.id)
     if (item.type === 'dropdown') {
+      console.log('Opening dropdown for:', item.label) // Debug log
       setOpenDropdown(item.id)
     }
   }
