@@ -185,7 +185,7 @@ export function Hero({ className }: HeroProps) {
           </motion.div>
         </div>
 
-        {/* Impact Section - 20% width (reduced froom 30%) */}
+        {/* Impact Section - 20% width (reduced from 30%) */}
         <div className="w-[20%] bg-white rounded-r-3xl h-full">
           <div ref={ref} className="w-full h-full p-2">
             <div className="grid grid-cols-1 gap-2 w-full h-full">
