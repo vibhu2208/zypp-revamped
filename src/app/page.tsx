@@ -4,8 +4,9 @@
 import {
   Navbar,
   Hero,
-  Impact,
+  Partners,
   WhyChooseZypp,
+  SaveMore,
   Comparison,
   PilotTimeline,
   Services,
@@ -19,12 +20,11 @@ export default function HomePage() {
       {/* Static Sections */}
       <Navbar />
       <Hero />
-      
-      {/* Dynamic Section with ISR */}
-      <Impact />
+      <Partners />
       
       {/* Static Sections */}
       <WhyChooseZypp />
+      <SaveMore />
       <Comparison />
       <PilotTimeline />
       <Services />
